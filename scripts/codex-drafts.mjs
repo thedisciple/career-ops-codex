@@ -20,6 +20,27 @@ const SCHEMA = {
   },
 };
 
+export function draftFingerprint({ source, cv, jd, card, facts = '' }) {
+  return createHash('sha256').update(JSON.stringify({ source, cv, jd, card, facts })).digest('hex');
+}
+
+export function isDraftCurrent(root, id) {
+  if (!/^[a-f0-9]{20}$/.test(id || '')) return false;
+  try {
+    const queue = join(root, 'data', 'codex-queue'), dir = join(root, 'output', 'drafts', id);
+    const prior = JSON.parse(readFileSync(join(dir, 'ready.json'), 'utf8'));
+    const factsPath = join(root, 'config', 'cv-facts.json');
+    const fingerprint = draftFingerprint({
+      source: JSON.parse(readFileSync(join(root, 'config', 'cv-source.json'), 'utf8')),
+      cv: readFileSync(join(root, 'cv.md'), 'utf8'),
+      jd: validateJd(readFileSync(join(queue, `${id}.jd.txt`), 'utf8')),
+      card: JSON.parse(readFileSync(join(queue, `${id}.result.json`), 'utf8')),
+      facts: existsSync(factsPath) ? readFileSync(factsPath, 'utf8') : '',
+    });
+    return prior.fingerprint === fingerprint && ['cv.pdf', 'cv.html', 'cover-letter.md', 'review.md'].every(path => existsSync(join(dir, path)));
+  } catch { return false; }
+}
+
 export function buildDraft(source, result) {
   const checkStrings = (items, max) => Array.isArray(items) && items.length > 0 && items.length <= max
     && items.every(x => typeof x === 'string' && x.trim() && x.length <= 4000);
@@ -51,7 +72,8 @@ export async function prepareDrafts({ root = getCareerOpsRoot(), id, codex, time
   const cv = readFileSync(join(root, 'cv.md'), 'utf8');
   const jd = validateJd(readFileSync(join(queue, `${id}.jd.txt`), 'utf8'));
   const dir = join(root, 'output', 'drafts', id); mkdirSync(dir, { recursive: true });
-  const fingerprint = createHash('sha256').update(JSON.stringify({ source, cv, jd, card })).digest('hex');
+  const factsPath = join(root, 'config', 'cv-facts.json');
+  const fingerprint = draftFingerprint({ source, cv, jd, card, facts: existsSync(factsPath) ? readFileSync(factsPath, 'utf8') : '' });
   const ready = join(dir, 'ready.json');
   if (existsSync(ready)) {
     const prior = JSON.parse(readFileSync(ready, 'utf8'));
@@ -98,6 +120,9 @@ export async function prepareDrafts({ root = getCareerOpsRoot(), id, codex, time
 }
 
 if (isMainModule(import.meta.url)) {
-  try { console.log(JSON.stringify(await prepareDrafts({ id: process.argv[2] }), null, 2)); }
+  try {
+    if (process.argv[2] === '--check') process.exitCode = isDraftCurrent(getCareerOpsRoot(), process.argv[3]) ? 0 : 1;
+    else console.log(JSON.stringify(await prepareDrafts({ id: process.argv[2] }), null, 2));
+  }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }

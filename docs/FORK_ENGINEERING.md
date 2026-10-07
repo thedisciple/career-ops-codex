@@ -41,6 +41,8 @@ Tested locally on Windows with Node 24.19.0 and Codex CLI 0.162.0-alpha.2. The r
 
 Focused checks: `node --test tests/codex-queue.test.mjs tests/codex-drafts.test.mjs tests/cv-facts-1c-brand.test.mjs` and `node verify-cv-facts.mjs --self-test`. The complete upstream suite is also run; its status must be reported separately because it contains Bash/Go/platform-sensitive checks. Passing the focused checks is not a claim that the full upstream suite passes on Windows.
 
+Latest local checks: 13 focused tests pass, including invalidation of draft readiness after CV/fact-policy changes or missing output files. The earlier full run reported 11,958 passes, 41 failures and 21 warnings; Bash-dependent failures remain unresolved on this machine. The isolated 1C brand fix is offered in [draft PR #4840](https://github.com/career-ops-hq/career-ops/pull/4840). A launcher should use `node scripts/codex-drafts.mjs --check CARD_ID` (exit 0 means current) rather than rely on the existence of `ready.json` alone.
+
 Live acceptance checks use private listings and candidate data, which are not included here. Public tests use synthetic fixtures. No interview, offer, time-saving or hiring-success metrics are claimed.
 
 ## Upstream collaboration
