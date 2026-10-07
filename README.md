@@ -2,7 +2,7 @@
 
 <p align="center">The open-source AI job search agent.</p>
 
-> **Community fork: Codex on Windows.** Maintained by [Anton Shcherbyna](https://github.com/thedisciple), with AI-assisted development using Codex. My contributions are the [resumable screening queue](docs/CODEX_QUEUE.md), source-preserving document drafts, and a tested fact-gate bug fix. See [my engineering work, architecture and validation](docs/FORK_ENGINEERING.md). External submission is a human action. The original career-ops project, its author Santiago Fernández de Valderrama Aparicio and contributors retain full credit. Upstream results quoted below are their results. This fork is not an official upstream release.
+> **Community fork: Codex on Windows.** Maintained by [Anton Shcherbyna](https://github.com/thedisciple), with AI-assisted development using Codex. My contributions are the [resumable screening queue](docs/CODEX_QUEUE.md), source-preserving document drafts, and a tested fact-gate bug fix. See [my engineering work, architecture and validation](docs/FORK_ENGINEERING.md). This fork additionally supports user-authorized automatic email submission through a host Gmail connector, durable send receipts and tracker reconciliation; see [automatic email](docs/AUTOMATIC_EMAIL.md). Upstream human-submit descriptions below apply to the original workflow. The original career-ops project, its author Santiago Fernández de Valderrama Aparicio and contributors retain full credit. Upstream results quoted below are their results. This fork is not an official upstream release.
 
 <p align="center">
   <a href="README.md">English</a> |

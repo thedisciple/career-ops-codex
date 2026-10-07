@@ -28,10 +28,10 @@ Public ATS feeds → upstream scanner → private URL inbox
                                     ↓
                Upstream HTML builder → fact gates → PDF
                                     ↓
-                         Candidate review / submission
+                         User authorization → durable outbox → host Gmail → SENT receipt → tracker
 ```
 
-The last step is a human action. There is no email transport or auto-submit adapter. A screening card is not an A-H report or a submitted application. Fit, personal interest and employment feasibility remain separate signals. Unknown eligibility remains explicit; an unknown hiring procedure does not imply that an employer has rejected the candidate.
+The fork adds a bounded email outbox with a host-provided Gmail transport, source and prior-contact gates, attachment fingerprints, durable attempts, delivery-failure evidence and canonical tracker reconciliation. See [AUTOMATIC_EMAIL.md](AUTOMATIC_EMAIL.md). ATS form submission remains separate. A screening card is not an A-H report or a submitted application. Fit, personal interest and employment feasibility remain separate signals. Unknown eligibility remains explicit; an unknown hiring procedure does not imply that an employer has rejected the candidate.
 
 Workers run outside the code checkout so they do not inherit the full evaluation workflow for a smaller task. State writes happen in the host. Queue locking and atomic replacement reduce duplicate/concurrent writes. A failed schema/fact/render gate does not publish a ready marker. Draft envelopes can be reused when source fingerprints are unchanged. Model text is still fallible; range checks and fact gates do not prove every paraphrase.
 
@@ -54,6 +54,8 @@ The queue proposal is [#4838](https://github.com/career-ops-hq/career-ops/issues
 - Broader board coverage, including company sites without supported public ATS feeds.
 - A verified import of existing application history and richer review UI.
 - Full A-H evaluation integration and per-form preparation beyond draft files.
-- Any future send adapter needs explicit review, portal-specific rules, dedup and truthful receipt reconciliation. CAPTCHA/anti-bot blocks are surfaced rather than bypassed.
+- Portal-specific ATS submission remains unfinished. CAPTCHA/anti-bot blocks are surfaced rather than bypassed. Gmail automation requires a connected host; a standalone terminal does not send mail.
 
 The value to another candidate is reusable Windows/Codex orchestration and recovery, not the maintainer's private search settings. To reproduce the first stage, follow [CODEX_QUEUE.md](CODEX_QUEUE.md). To prepare documents, provide your own canonical `config/cv-source.json` in the private data root using the HTML payload keys documented by the upstream builder, then run `node scripts/codex-drafts.mjs CARD_ID`. Drafting currently requires a captured `{CARD_ID}.jd.txt` and is an experimental downstream utility.
+
+Email acceptance tests use fictional data and a simulated 100-send campaign. They do not demonstrate 100 delivered applications, interviews or offers. Real candidate campaign records stay private.
