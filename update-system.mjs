@@ -280,6 +280,8 @@ const SYSTEM_PATHS = [
   'lib/page-format.mjs',
   'scan-hn.mjs',
   'scripts/check-syntax.mjs',
+  'scripts/codex-queue.mjs',
+  'scripts/codex-drafts.mjs',
   'scripts/export-ats-text.mjs',
   'scripts/followup-sweep.sh',
   'story-provenance-check.mjs',
