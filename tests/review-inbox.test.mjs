@@ -21,3 +21,15 @@ test('only credential-free HTTPS destinations are linked',()=>{
   assert.equal(safeWebUrl('file:///secret'),null);
   assert.equal(safeWebUrl('https://example.com/jobs'),'https://example.com/jobs');
 });
+test('sent applications link their original posting or careers source without active unsafe URLs',()=>{
+  const rows=[
+    {state:'sent',company:'Example',role:'Engineer',kind:'job_application',url:'https://example.org/jobs/123?lang=en&ref=cv',receipt:{id:'m1'}},
+    {state:'sent',company:'Other',role:'Open application',kind:'open_application',url:'https://other.example/careers',receipt:{id:'m2'}},
+    {state:'sent',company:'Unsafe',role:'Engineer',kind:'job_application',url:'javascript:alert(1)',receipt:{id:'m3'}},
+  ];
+  const result=renderReview({root:tmpdir(),cards:[],deliveries:{sent:3,ready:0,unknown:0,rows}});
+  assert.match(result.markdown,/\[Вакансия\]\(<https:\/\/example.org\/jobs\/123\?lang=en&ref=cv>\)/);
+  assert.match(result.html,/href="https:\/\/example.org\/jobs\/123\?lang=en&amp;ref=cv"/);
+  assert.match(result.markdown,/\[Карьера \/ открытая заявка\]/);
+  assert.match(result.html,/Источник не указан/);assert.doesNotMatch(result.html,/javascript:/);
+});
